@@ -77,6 +77,12 @@ func (vars VarSet) String() string {
 	return buf.String()
 }
 
+// Print prints a shell script that defines all variables in the set to os.Stdout.
+// Variable descriptions are added as comments.
+func (vars VarSet) Print() {
+	vars.PrintTo(os.Stdout)
+}
+
 // PrintTo prints a shell script that defines all variables in the set.
 // Variable descriptions are added as comments.
 func (vars VarSet) PrintTo(out io.Writer) {
