@@ -1,40 +1,45 @@
-Go: Load config from the environment 
-====================================
+# envloader
 
-WIP in terms of API and docs.
+Parse environment variables into typed Go values, with required and conditional settings. Uses `flag.Value` parsers.
 
-[![Go reference](https://pkg.go.dev/badge/github.com/andreyvit/envloader.svg)](https://pkg.go.dev/github.com/andreyvit/envloader) [![Go report card](https://goreportcard.com/badge/github.com/andreyvit/envloader)](https://goreportcard.com/report/github.com/andreyvit/envloader)
+Status: the API is a work in progress.
 
+## Install
 
-Why?
-----
+Requires Go 1.19 or newer.
 
-TODO
-
-
-Usage
------
-
-Install:
-
-    go get github.com/andreyvit/envloader
-
-Use:
-
-```go
-TODO
+```sh
+go get github.com/andreyvit/envloader@latest
 ```
 
+## Example
 
-Contributing
-------------
+```go
+package main
 
-This library is a work in progress.
+import (
+	"fmt"
+	"os"
 
-We recommend [modd](https://github.com/cortesi/modd) (`go install github.com/cortesi/modd/cmd/modd@latest`) for continuous testing during development.
+	"github.com/andreyvit/envloader"
+)
 
+func main() {
+	var port int
+	var vars envloader.VarSet
+	vars.Var("APP_PORT", envloader.Required, envloader.IntVar(&port), "HTTP port")
+	// Use vars.TryParse() to read the process environment.
+	err := vars.TryParseFrom(func(name string) string { return map[string]string{"APP_PORT": "8080"}[name] })
+	if err != nil {
+		envloader.PrintError(err, os.Stderr)
+		os.Exit(2)
+	}
+	fmt.Println(port) // 8080
+}
+```
 
-MIT license
------------
+Use `Optional` for optional values and `WhenTrue` for conditional requirements. `Parse` prints errors and exits; `TryParse` lets the caller decide. Avoid printing variable values when they contain secrets.
 
-Copyright (c) 2023 Andrey Tarantsov. Published under the terms of the [MIT license](LICENSE).
+## License
+
+See [LICENSE](LICENSE).
